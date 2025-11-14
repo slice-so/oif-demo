@@ -18,25 +18,11 @@ import {Steps} from "./libraries/Steps.sol";
 import {VariableRoles} from "./libraries/VariableRoles.sol";
 import {OrderResolverCompactPayload} from "./types/OrderResolverCompactPayload.sol";
 
-// TODO: Change assumptions comments into requires
-
 /**
- * 1. USER
- * - deposits in the compact and choose an allocator
- *
- * 2. APP
- * - format calldata for contract call --> to be used as callback
- * - calculate funds required to purchase
- * - get a quote from solver/aggregator to know funds required on origin chain
- * - create a StandardOrder for the user
- * - triggers user signature of the compact to use a resource lock -> to generate the
- * - formats the ERC-7683 payload + resolver address -> to be sent to the feed/solver
- *
- * 3. RESOLVER
- * - gets payload
- * - returns ERC-7683 compliant ResolvedOrder payload
+ * @title OrderResolverCompact
+ * @author jacopo.eth, frangio
+ * @notice Resolves a Compact StandardOrder into a ResolvedOrder.
  */
-
 contract OrderResolverCompact {
     error ContextOutOfRange();
     error CallOutOfRange();
@@ -44,10 +30,10 @@ contract OrderResolverCompact {
     uint32 public constant ARBITRUM_CHAINID = 42161;
     uint32 public constant BASE_CHAINID = 8453;
 
-    address public constant HYPERLANE_ORACLE_ARBITRUM = 0x979Ca5202784112f4738403dBec5D0F3B9daabB9;
-    address public constant HYPERLANE_ORACLE_BASE = 0xeA87ae93Fa0019a82A727bfd3eBd1cFCa8f64f1D;
+    address public constant ARBITRUM_HYPERLANE_ORACLE = 0x979Ca5202784112f4738403dBec5D0F3B9daabB9;
+    address public constant BASE_HYPERLANE_ORACLE = 0xeA87ae93Fa0019a82A727bfd3eBd1cFCa8f64f1D;
 
-    uint256 public constant GAS_PRICE_BASE = 1e8; // 0.1 gwei
+    uint256 public constant BASE_GAS_PRICE = 1e8; // 0.1 gwei
     uint256 public constant GAS_LIMIT = 150_000;
 
     function variableArgument(uint256 index) internal pure returns (bytes memory) {
@@ -123,7 +109,7 @@ contract OrderResolverCompact {
             bytes[] memory arguments = new bytes[](6);
             {
                 arguments[0] = abi.encode("", uint32(order.originChainId));
-                arguments[1] = abi.encode("", HYPERLANE_ORACLE_ARBITRUM);
+                arguments[1] = abi.encode("", ARBITRUM_HYPERLANE_ORACLE);
                 arguments[2] = abi.encode("", GAS_LIMIT);
                 arguments[3] = abi.encode("", new bytes(0)); // customMetadata
                 arguments[4] = abi.encode("", output.settler); // source
@@ -133,14 +119,14 @@ contract OrderResolverCompact {
             bytes[] memory attributes = new bytes[](1);
             {
                 // Gas needed to cover execution on destination chain. We assume a gasPrice of 0.1 gwei
-                attributes[0] = Attributes.WithCallValue(GAS_PRICE_BASE * GAS_LIMIT);
+                attributes[0] = Attributes.WithCallValue(BASE_GAS_PRICE * GAS_LIMIT);
             }
 
             uint256[] memory dependencySteps = new uint256[](1);
             dependencySteps[0] = 0;
 
             steps[1] = Steps.Call(
-                InteroperableAddress.formatEvmV1(output.chainId, address(bytes20(HYPERLANE_ORACLE_BASE))),
+                InteroperableAddress.formatEvmV1(output.chainId, address(bytes20(BASE_HYPERLANE_ORACLE))),
                 IHyperlaneOracle.submit.selector,
                 arguments,
                 attributes,
@@ -165,13 +151,13 @@ contract OrderResolverCompact {
                 bytes[] memory isProvenArguments = new bytes[](4);
                 {
                     isProvenArguments[0] = abi.encode("", output.chainId);
-                    isProvenArguments[1] = abi.encode("", HYPERLANE_ORACLE_BASE);
+                    isProvenArguments[1] = abi.encode("", BASE_HYPERLANE_ORACLE);
                     isProvenArguments[2] = abi.encode("", output.settler);
                     isProvenArguments[3] = variableArgument(4); // dataHash
                 }
 
                 attributes[0] = Attributes.OnlyWhenCallResult(
-                    InteroperableAddress.formatEvmV1(order.originChainId, address(bytes20(HYPERLANE_ORACLE_ARBITRUM))),
+                    InteroperableAddress.formatEvmV1(order.originChainId, address(bytes20(ARBITRUM_HYPERLANE_ORACLE))),
                     IHyperlaneOracle.isProven.selector,
                     isProvenArguments,
                     abi.encode(true),

@@ -11,7 +11,8 @@ contract SetupTest is Test {
 
     uint32 constant ARBITRUM_CHAINID = 42161;
     uint32 constant BASE_CHAINID = 8453;
-    address constant HYPERLANE_ORACLE_BASE = 0xeA87ae93Fa0019a82A727bfd3eBd1cFCa8f64f1D;
+    address constant BASE_HYPERLANE_ORACLE = 0xeA87ae93Fa0019a82A727bfd3eBd1cFCa8f64f1D;
+    address constant ARBITRUM_HYPERLANE_ORACLE = 0x979Ca5202784112f4738403dBec5D0F3B9daabB9;
 
     function setUp() public {
         resolver = new OrderResolverCompact();
@@ -21,7 +22,7 @@ contract SetupTest is Test {
     function _createValidOrder() internal view returns (StandardOrder memory) {
         MandateOutput[] memory outputs = new MandateOutput[](1);
         outputs[0] = MandateOutput({
-            oracle: bytes32(uint256(uint160(HYPERLANE_ORACLE_BASE))),
+            oracle: bytes32(uint256(uint160(BASE_HYPERLANE_ORACLE))),
             settler: bytes32(uint256(uint160(address(0x1234)))),
             chainId: BASE_CHAINID,
             token: bytes32(uint256(uint160(address(0x5678)))),

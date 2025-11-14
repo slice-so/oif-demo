@@ -2,6 +2,7 @@
 pragma solidity 0.8.30;
 
 import {SetupTest} from "./setup.t.sol";
+import {console} from "forge-std/console.sol";
 import {OrderResolverCompact} from "../src/OrderResolverCompact.sol";
 import {StandardOrder} from "../src/types/StandardOrder.sol";
 import {ResolvedOrder} from "../src/types/ResolvedOrder.sol";
@@ -9,14 +10,12 @@ import {OrderResolverCompactPayload} from "../src/types/OrderResolverCompactPayl
 import {MandateOutput} from "../src/libraries/MandateOutputType.sol";
 
 contract OrderResolverCompactTest is SetupTest {
-    address constant HYPERLANE_ORACLE_ARBITRUM = 0x979Ca5202784112f4738403dBec5D0F3B9daabB9;
-
     function test_Constants() public view {
         assertEq(resolver.ARBITRUM_CHAINID(), ARBITRUM_CHAINID);
         assertEq(resolver.BASE_CHAINID(), BASE_CHAINID);
-        assertEq(resolver.HYPERLANE_ORACLE_ARBITRUM(), HYPERLANE_ORACLE_ARBITRUM);
-        assertEq(resolver.HYPERLANE_ORACLE_BASE(), HYPERLANE_ORACLE_BASE);
-        assertEq(resolver.GAS_PRICE_BASE(), 1e8);
+        assertEq(resolver.ARBITRUM_HYPERLANE_ORACLE(), ARBITRUM_HYPERLANE_ORACLE);
+        assertEq(resolver.BASE_HYPERLANE_ORACLE(), BASE_HYPERLANE_ORACLE);
+        assertEq(resolver.BASE_GAS_PRICE(), 1e8);
         assertEq(resolver.GAS_LIMIT(), 150_000);
     }
 
@@ -27,6 +26,8 @@ contract OrderResolverCompactTest is SetupTest {
         // Create payload
         OrderResolverCompactPayload memory payload =
             OrderResolverCompactPayload({order: order, sponsorSignature: hex"1234", allocatorData: hex"5678"});
+
+        // console.logBytes(abi.encode(payload));
 
         // Resolve the order
         ResolvedOrder memory resolvedOrder = resolver.resolve(abi.encode(payload));

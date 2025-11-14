@@ -32,4 +32,4 @@ forge-std = "1.9.7"
 
 [lint]
 ignore = ["test/**/*.sol"]
-exclude_lints=["mixed-case-function", "mixed-case-variable", "erc20-unchecked-transfer", "asm-keccak256", "named-struct-fields"]
+exclude_lints=["mixed-case-function", "mixed-case-variable", "erc20-unchecked-transfer", "asm-keccak256", "named-struct-fields", "unsafe-typecast"]
