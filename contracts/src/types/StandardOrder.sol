@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0
 pragma solidity 0.8.30;
 
-import {MandateOutput} from "./MandateOutput.sol";
+import {MandateOutput} from "../libraries/MandateOutputType.sol";
 
 struct StandardOrder {
     address user;

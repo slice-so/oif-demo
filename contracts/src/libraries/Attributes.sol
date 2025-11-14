@@ -24,6 +24,7 @@ interface Attribute {
     function WithTimestamp(uint256 timestampVarIdx) external;
     function WithBlockNumber(uint256 blockNumberVarIdx) external;
     function WithEffectiveGasPrice(uint256 gasPriceVarIdx) external;
+    function WithCallValue(uint256 value) external;
 }
 
 library Attributes {
@@ -71,5 +72,9 @@ library Attributes {
 
     function WithEffectiveGasPrice(uint256 gasPriceVarIdx) internal pure returns (bytes memory) {
         return abi.encodeCall(Attribute.WithEffectiveGasPrice, (gasPriceVarIdx));
+    }
+
+    function WithCallValue(uint256 value) internal pure returns (bytes memory) {
+        return abi.encodeCall(Attribute.WithCallValue, (value));
     }
 }
