@@ -1,16 +1,11 @@
-# Slice OIF Demo
+# OIF Contracts
 
-Smart contract and application code for the Slice OIF demo.
+ERC-7683 compliant OutputCallback and OrderResolver for Compact orders intended for filler consumption.
 
-## Overview
+## Core Contracts
 
-
-
-## Architecture
-
-### Core Contracts
-
-- **SliceOrderResolver**: Resolver contract to resolve orders into the ERC-7683 format.
+- **OutputCallback**: Executes transaction based on provided callback data.
+- **OrderResolverCompact**: Resolver contract to resolve Compact orders into the ERC-7683 format.
 
 ## Development
 
